@@ -1,0 +1,21 @@
+How to configure download to robot config
+
+First find the output file path name for the build target you want to deploy 
+typically in 
+
+PPC603gnu\YourProject\Debug\Something.out
+
+Then get it's properties to figure out the full path name which might look something like :
+
+C:\WindRiver\workspace\Phoenix2013\RobotCode\PPC603gnu\SimpleTemplate\Debug\SimpleTemplate.out
+
+In Eclipse go to 
+
+Windows->Preferences->First Downloader Preferences.
+and paste the value there.
+
+Old code
+C:\WindRiver\workspace\Phoenix2013\RobotCode\PPC603gnu\SimpleTemplate\Debug\SimpleTemplate.out
+
+temp code
+C:\WindRiver\workspace\SimpleTemplate\PPC603gnu\SimpleTemplate\Debug\SimpleTemplate.out

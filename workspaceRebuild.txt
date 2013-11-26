@@ -1,0 +1,38 @@
+
+If you have to restart a workspace here are the steps to get
+going again based on a FRC example project.
+
+This deals with a lot of the project configuration so is
+an easy way to get the build settings right then pull down the
+current repo code.
+
+This assumes the workspace is at
+c:\windriver\workspace
+Git Bash is the shell used (mingw based)
+And your system has network connectivity to github.com
+
+From WindRiver Workbench,
+
+File->New->Example
+   Choose M+ VxWorks Downloadable Kernel Module Sample Project
+   Pick an appropriate  project like FRC Simple Robot Template
+
+Then Right click the workspace and rename (F2) it to
+the github repo (like minibuild2013)
+
+Then you can use the github command line and enter the following commands
+to connect the sample project to the git hub repo.
+
+
+cd /c/windriver/workspace/
+
+#  cd <yourreponame>  
+cd minibuild2013
+
+rm MyRobot.cpp  # since we are going to pull the current from github
+
+git remote add origin https://github.com/phoenixfrc/minibuild2013.git
+git fetch
+git checkout -t origin/master
+git status
+

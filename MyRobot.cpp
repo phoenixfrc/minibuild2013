@@ -6,27 +6,24 @@
  * Autonomous and OperatorControl methods at the right time as controlled by the switches on
  * the driver station or the field controls.
  */ 
-class PhoenixRobot : public SimpleRobot
+class RobotDemo : public SimpleRobot
 {
-	//CANJaguar leftRear;
-	//CANJaguar leftFront;
-	//CANJaguar rightRear;
-	//CANJaguar rightFront;
-	RobotDrive driveTrain; // robot drive system
-	Joystick leftStick;
+	RobotDrive myRobot; // robot drive system
+	Joystick leftStick; // only joystick
 	Joystick rightStick;
+	Joystick gamePad;
+	DriverStationLCD *lcd;
 
 public:
-	PhoenixRobot(void):
-		driveTrain(2,3, 4,5),	// these must be initialized in the same order
-		//leftRear(2),
-		//leftFront(3),
-		//rightRear(4),
-		//rightFront(5),
-		leftStick(1),		// as they are declared above.
-		rightStick(2)
+	RobotDemo(void):
+		myRobot(1, 2),	// these must be initialized in the same order
+		// change to 1, 2, 3, 4 on myRobot
+		leftStick(2),		// as they are declared above.
+		rightStick(1),
+		gamePad(3),
+		lcd(DriverStationLCD::GetInstance())
 	{
-		driveTrain.SetExpiration(0.1);
+		myRobot.SetExpiration(0.1);
 	}
 
 	/**
@@ -34,29 +31,37 @@ public:
 	 */
 	void Autonomous(void)
 	{
-		driveTrain.SetSafetyEnabled(false);
-		driveTrain.Drive(-0.5, 0.0); 	// drive forwards half speed
-		Wait(2.0); 				//    for 2 seconds
-		driveTrain.Drive(0.0, 0.0); 	// stop robot
+		myRobot.SetSafetyEnabled(false);
+		myRobot.Drive(-0.3, 0.0); 	// drive forwards half speed
+		Wait(1.0); 				//    for 2 seconds
+		myRobot.Drive(0.0, 0.0); 	// stop robot
 	}
 
 	/**
-	 * Runs the motors with arcade steering.
+	 * Runs the motors with arcade steering. 
 	 */
 	void OperatorControl(void)
 	{
-		driveTrain.SetSafetyEnabled(true);
+		myRobot.SetSafetyEnabled(true);
+		lcd->PrintfLine(DriverStationLCD::kUser_Line1, "%s", "in OpCtl - rev 1");
+		lcd->UpdateLCD();
+		int loopcount = 0;
 		while (IsOperatorControl())
 		{
-			//leftFront.Set(leftStick.GetAxis(Joystick::kXAxis));
-			//leftRear.Set(leftStick.GetAxis(Joystick::kXAxis));
-			//rightFront.Set(rightStick.GetAxis(Joystick::kXAxis));
-			//rightRear.Set(rightStick.GetAxis(Joystick::kXAxis));
-			driveTrain.TankDrive(leftStick, rightStick); // drive with arcade style (use right stick)
+			if (loopcount%400 == 0) {
+				lcd->PrintfLine(DriverStationLCD::kUser_Line2, "js val %f %f %d",
+						leftStick.GetAxis(Joystick::kXAxis),
+						rightStick.GetAxis(Joystick::kXAxis),
+						loopcount);
+				lcd->UpdateLCD();
+			}
+			
+			myRobot.TankDrive(leftStick, rightStick); // drive with arcade style (use right stick)
 			Wait(0.005);				// wait for a motor update time
+			loopcount++;
 		}
 	}
-
+	
 	/**
 	 * Runs during test mode
 	 */
@@ -65,5 +70,5 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(PhoenixRobot);
+START_ROBOT_CLASS(RobotDemo);
 

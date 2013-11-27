@@ -16,7 +16,7 @@ class RobotDemo : public SimpleRobot
 
 public:
 	RobotDemo(void):
-		myRobot(1, 2),	// these must be initialized in the same order
+		myRobot(1, 2, 3, 4),	// these must be initialized in the same order
 		// change to 1, 2, 3, 4 on myRobot
 		leftStick(2),		// as they are declared above.
 		rightStick(1),
@@ -43,6 +43,7 @@ public:
 	void OperatorControl(void)
 	{
 		myRobot.SetSafetyEnabled(true);
+		lcd->PrintfLine(DriverStationLCD::kUser_Line5, "Hi there from phoenix2");
 		lcd->PrintfLine(DriverStationLCD::kUser_Line1, "%s", "in OpCtl - rev 1");
 		lcd->UpdateLCD();
 		int loopcount = 0;

@@ -94,12 +94,16 @@ public:
 			}
 			cameraPivotMotor.SetAngle(cameraPivotAngle);
 			cameraElevateMotor.SetAngle(cameraElevateAngle);
-			if (gamePad.GetRawButton(8)){
+			if (gamePad.GetRawButton(8)){//We think 8 is right trigger
 				kicker.Set(Relay::kReverse);
-				blocker.Set(Relay::kReverse);
 			}
 			else{
 				kicker.Set(Relay::kOff);
+			}
+			if (gamePad.GetRawButton(7)){
+				blocker.Set(Relay::kReverse);
+			}
+			else{
 				blocker.Set(Relay::kOff);
 			}
 			Wait(0.005);				// wait for a motor update time
@@ -109,9 +113,42 @@ public:
 	
 	/**
 	 * Runs during test mode
+	 * Blue X = button 1
+	 * Green A = button 2
+	 * Red B = button 3
+	 * Yellow Y = button 4
+	 * LB = button 5
+	 * RB = button 6
+	 * LT = button 7
+	 * RT = button 8
 	 */
 	void Test() {
-
+		int loopcount = 0;
+		while (IsTest())
+		{
+			bool button1 = gamePad.GetRawButton(1);
+			bool button2 = gamePad.GetRawButton(2);
+			bool button3 = gamePad.GetRawButton(3);
+			bool button4 = gamePad.GetRawButton(4);
+			bool button5 = gamePad.GetRawButton(5);
+			bool button6 = gamePad.GetRawButton(6);
+			bool button7 = gamePad.GetRawButton(7);
+			bool button8 = gamePad.GetRawButton(8);
+			lcd->PrintfLine(DriverStationLCD::kUser_Line3,"Test Mode");
+			lcd->PrintfLine(DriverStationLCD::kUser_Line4,"%d", loopcount/10);
+			lcd->PrintfLine(DriverStationLCD::kUser_Line5, "gamepad = %c%c%c%c %c%c%c%c", 
+					button1 ? '1': '0',
+					button2 ? '1': '0',
+					button3 ? '1': '0',
+					button4 ? '1': '0',
+					button5 ? '1': '0',
+					button6 ? '1': '0',
+					button7 ? '1': '0',
+					button8 ? '1': '0');
+			lcd->UpdateLCD();
+			Wait(0.1); // wait for to minimize display output
+			loopcount++;
+		}
 	}
 };
 

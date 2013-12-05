@@ -8,6 +8,9 @@
  */ 
 class RobotDemo : public SimpleRobot
 {
+	enum BlockerState {Down, Up};
+	enum KickerState {Forward, Back};
+	
 	RobotDrive myRobot; // robot drive system
 	Joystick leftStick; // only joystick
 	Joystick rightStick;
@@ -20,9 +23,11 @@ class RobotDemo : public SimpleRobot
 	Compressor compressor;
 	Relay kicker;
 	Relay blocker;
+	BlockerState blockerState;
+	KickerState kickerState;
 public:
 	RobotDemo(void):
-		myRobot(1, 2, 3, 4),	// these must be initialized in the same order
+		myRobot(3, 4, 1, 2),	// these must be initialized in the same order
 		// change to 1, 2, 3, 4 on myRobot
 		leftStick(2),		// as they are declared above.
 		rightStick(1),
@@ -32,9 +37,16 @@ public:
 		cameraElevateMotor(10),
 		compressor(9,1),
 		kicker(2),
-		blocker(3)
+		blocker(3),
+		blockerState(Up),
+		kickerState(Back)
 	{
 		myRobot.SetExpiration(0.1);
+
+		myRobot.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
+		myRobot.SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
+		myRobot.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+		myRobot.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 		compressor.Start();
 	}
 	void RobotInit(){
@@ -43,6 +55,9 @@ public:
 		cameraPivotAngle = 0;
 		cameraPivotMotor.SetAngle(cameraPivotAngle);
 		cameraElevateMotor.SetAngle(cameraElevateAngle);
+		blocker.Set(Relay::kReverse);
+		kicker.Set(Relay::kOff);
+		
 	}
 	/**
 	 * Drive left & right motors for 2 seconds then stop
@@ -94,17 +109,25 @@ public:
 			}
 			cameraPivotMotor.SetAngle(cameraPivotAngle);
 			cameraElevateMotor.SetAngle(cameraElevateAngle);
-			if (gamePad.GetRawButton(8)){//We think 8 is right trigger
-				kicker.Set(Relay::kReverse);
+			KickerState newKickerState = gamePad.GetRawButton(8)? Forward:Back;
+			if(newKickerState != kickerState){
+				if (newKickerState == Forward){
+					kicker.Set(Relay::kReverse);
+				}
+				else{
+					kicker.Set(Relay::kOff);
+				}
+				kickerState = newKickerState;
 			}
-			else{
-				kicker.Set(Relay::kOff);
-			}
-			if (gamePad.GetRawButton(7)){
-				blocker.Set(Relay::kReverse);
-			}
-			else{
-				blocker.Set(Relay::kOff);
+			BlockerState newBlockerState = gamePad.GetRawButton(7)? Down:Up;
+			if(newBlockerState != blockerState){
+				if (newBlockerState == Up){
+					blocker.Set(Relay::kReverse);
+				}
+				else{
+					blocker.Set(Relay::kOff);
+				}
+				blockerState = newBlockerState;
 			}
 			Wait(0.005);				// wait for a motor update time
 			loopcount++;

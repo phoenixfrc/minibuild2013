@@ -43,10 +43,10 @@ public:
 	{
 		myRobot.SetExpiration(0.1);
 
-		myRobot.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
-		myRobot.SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
-		myRobot.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
-		myRobot.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
+		//myRobot.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
+		//myRobot.SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
+		//myRobot.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+		//myRobot.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 		compressor.Start();
 	}
 	void RobotInit(){
@@ -119,6 +119,10 @@ public:
 				}
 				kickerState = newKickerState;
 			}
+			//bool 
+			//if (blockerState == Up)}{
+			//	
+			//}
 			BlockerState newBlockerState = gamePad.GetRawButton(7)? Down:Up;
 			if(newBlockerState != blockerState){
 				if (newBlockerState == Up){

@@ -80,6 +80,7 @@ public:
 		lcd->PrintfLine(DriverStationLCD::kUser_Line1, "%s", "in OpCtl - rev 1");
 		lcd->UpdateLCD();
 		int loopcount = 0;
+		int stateHoldCount = 50;
 		while (IsOperatorControl())
 		{
 			if (loopcount%400 == 0) {
@@ -119,19 +120,30 @@ public:
 				}
 				kickerState = newKickerState;
 			}
-			//bool 
-			//if (blockerState == Up)}{
-			//	
-			//}
-			BlockerState newBlockerState = gamePad.GetRawButton(7)? Down:Up;
-			if(newBlockerState != blockerState){
-				if (newBlockerState == Up){
-					blocker.Set(Relay::kReverse);
+			//Detrmine if State button is pressed
+			bool blockerButtonPressed = gamePad.GetRawButton(7);
+			if (stateHoldCount >= 50){
+				//Change state if button pressed
+				if (blockerState == Up && blockerButtonPressed)
+				{
+					stateHoldCount = 0;
+					blockerState = Down;
 				}
-				else{
-					blocker.Set(Relay::kOff);
+				else if(blockerState == Down && blockerButtonPressed){
+					stateHoldCount = 0;
+					blockerState = Up;
 				}
-				blockerState = newBlockerState;
+				//else no change to state
+			}
+			else{ //holding for 50 counts
+				stateHoldCount++;
+			}
+			//Set blocker output based on state
+			if (blockerState == Up){
+				blocker.Set(Relay::kReverse);
+			}
+			else{
+				blocker.Set(Relay::kOff);
 			}
 			Wait(0.005);				// wait for a motor update time
 			loopcount++;

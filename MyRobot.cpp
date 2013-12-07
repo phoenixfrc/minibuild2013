@@ -1,5 +1,7 @@
 #include "WPILib.h"
 
+#define KICKDELAYCOUNT 200
+
 /**
  * This is a demo program showing the use of the RobotBase class.
  * The SimpleRobot class is the base of a robot application that will automatically call your
@@ -25,6 +27,8 @@ class RobotDemo : public SimpleRobot
 	Relay blocker;
 	BlockerState blockerState;
 	KickerState kickerState;
+	DigitalInput ballsensorleft;
+	DigitalInput ballsensorright;
 public:
 	RobotDemo(void):
 		myRobot(3, 4, 1, 2),	// these must be initialized in the same order
@@ -39,7 +43,10 @@ public:
 		kicker(2),
 		blocker(3),
 		blockerState(Up),
-		kickerState(Back)
+		kickerState(Back),
+		ballsensorleft(1),
+		ballsensorright(2)
+	
 	{
 		myRobot.SetExpiration(0.1);
 
@@ -111,9 +118,13 @@ public:
 			}
 			cameraPivotMotor.SetAngle(cameraPivotAngle);
 			cameraElevateMotor.SetAngle(cameraElevateAngle);
+			
+			
 			KickerState newKickerState = gamePad.GetRawButton(8)? Forward:Back;
 			//Detrmine if State button is pressed
 			bool blockerButtonPressed = gamePad.GetRawButton(7);
+			bool ballSwitchOn = (ballsensorleft.Get() == 0); // || (ballsensorright.Get() == 0);
+			
 			if (stateHoldCount >= 50){
 				//Change state if button pressed
 				if (blockerState == Up && blockerButtonPressed)
@@ -132,9 +143,14 @@ public:
 			}
 			if(newKickerState == Forward && kickerdelay == 0){//auto raise if down is presed
 				blockerState = Up;
-				kickerdelay = 5;
+				kickerdelay = KICKDELAYCOUNT;
 			}
+			
+			//else if (ballSwitchOn){
+				//blockerState = Down;
+			//}
 			//Set blocker output based on state
+			
 			char *blockerStateString = "Blocker is up.";
 			bool timeToDisplayBlockerState = loopcount%40 == 0;
 			if (blockerState == Up){
@@ -144,7 +160,11 @@ public:
 				blocker.Set(Relay::kOff);
 				blockerStateString = "Blocker is down.";
 			}
-			if(newKickerState != kickerState && kickerdelay == 0){
+			
+			if ((newKickerState != kickerState) 
+					// && (kickerdelay <= 0)
+			  )
+			{
 				if (newKickerState == Forward){
 					kicker.Set(Relay::kReverse);
 				}
@@ -155,6 +175,7 @@ public:
 			}
 			if (timeToDisplayBlockerState) {
 				lcd->PrintfLine(DriverStationLCD::kUser_Line4, blockerStateString);
+				lcd->PrintfLine(DriverStationLCD::kUser_Line3, "KickDelay = %d", kickerdelay);
 				lcd->UpdateLCD();
 			}
 			Wait(0.005);				// wait for a motor update time
@@ -199,6 +220,10 @@ public:
 					button6 ? '1': '0',
 					button7 ? '1': '0',
 					button8 ? '1': '0');
+			
+			UINT32 ballSenseLeft = ballsensorleft.Get();
+			UINT32 ballSenseRight = ballsensorright.Get();
+			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "lbs=%d rbs=%d", ballSenseLeft, ballSenseRight);
 			lcd->UpdateLCD();
 			Wait(0.1); // wait for to minimize display output
 			loopcount++;

@@ -16,6 +16,7 @@ From WindRiver Workbench,
 File->New->Example
    Choose M+ VxWorks Downloadable Kernel Module Sample Project
    Pick an appropriate  project like FRC Simple Robot Template
+   click finish
 
 Then Right click the workspace and rename (F2) it to
 the github repo (like minibuild2013)
@@ -31,6 +32,7 @@ cd minibuild2013
 
 rm MyRobot.cpp  # since we are going to pull the current from github
 
+git init
 git remote add origin https://github.com/phoenixfrc/minibuild2013.git
 git fetch
 git checkout -t origin/master

@@ -81,6 +81,7 @@ public:
 		lcd->UpdateLCD();
 		int loopcount = 0;
 		int stateHoldCount = 50;
+		int kickerdelay = 0;
 		while (IsOperatorControl())
 		{
 			if (loopcount%400 == 0) {
@@ -111,15 +112,6 @@ public:
 			cameraPivotMotor.SetAngle(cameraPivotAngle);
 			cameraElevateMotor.SetAngle(cameraElevateAngle);
 			KickerState newKickerState = gamePad.GetRawButton(8)? Forward:Back;
-			if(newKickerState != kickerState){
-				if (newKickerState == Forward){
-					kicker.Set(Relay::kReverse);
-				}
-				else{
-					kicker.Set(Relay::kOff);
-				}
-				kickerState = newKickerState;
-			}
 			//Detrmine if State button is pressed
 			bool blockerButtonPressed = gamePad.GetRawButton(7);
 			if (stateHoldCount >= 50){
@@ -138,6 +130,10 @@ public:
 			else{ //holding for 50 counts
 				stateHoldCount++;
 			}
+			if(newKickerState == Forward && kickerdelay == 0){//auto raise if down is presed
+				blockerState = Up;
+				kickerdelay = 5;
+			}
 			//Set blocker output based on state
 			char *blockerStateString = "Blocker is up.";
 			bool timeToDisplayBlockerState = loopcount%40 == 0;
@@ -148,11 +144,23 @@ public:
 				blocker.Set(Relay::kOff);
 				blockerStateString = "Blocker is down.";
 			}
+			if(newKickerState != kickerState && kickerdelay == 0){
+				if (newKickerState == Forward){
+					kicker.Set(Relay::kReverse);
+				}
+				else{
+					kicker.Set(Relay::kOff);
+				}
+				kickerState = newKickerState;
+			}
 			if (timeToDisplayBlockerState) {
 				lcd->PrintfLine(DriverStationLCD::kUser_Line4, blockerStateString);
 				lcd->UpdateLCD();
 			}
 			Wait(0.005);				// wait for a motor update time
+			if (kickerdelay != 0){
+				kickerdelay--;
+			}
 			loopcount++;
 		}
 	}

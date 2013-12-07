@@ -88,7 +88,7 @@ public:
 						leftStick.GetAxis(Joystick::kXAxis),
 						rightStick.GetAxis(Joystick::kXAxis),
 						loopcount);
-				lcd->UpdateLCD();
+				//lcd->UpdateLCD(); //now updating below
 			}
 			
 			myRobot.TankDrive(leftStick, rightStick); // drive with arcade style (use right stick)
@@ -139,11 +139,18 @@ public:
 				stateHoldCount++;
 			}
 			//Set blocker output based on state
+			char *blockerStateString = "Blocker is up.";
+			bool timeToDisplayBlockerState = loopcount%40 == 0;
 			if (blockerState == Up){
 				blocker.Set(Relay::kReverse);
 			}
-			else{
+			else{//blocker is down
 				blocker.Set(Relay::kOff);
+				blockerStateString = "Blocker is down.";
+			}
+			if (timeToDisplayBlockerState) {
+				lcd->PrintfLine(DriverStationLCD::kUser_Line4, blockerStateString);
+				lcd->UpdateLCD();
 			}
 			Wait(0.005);				// wait for a motor update time
 			loopcount++;
